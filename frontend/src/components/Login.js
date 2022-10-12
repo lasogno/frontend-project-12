@@ -16,7 +16,7 @@ const Login = () => {
                             <Card.Body className='row p-5'>
                                 <AuthForm />
                                 <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-                                <img src={chatImage} height="200" width="200"></img>
+                                <img src={chatImage} height="200" width="200" alt='Письмо с сердечком'></img>
                                 </div>
                             </Card.Body>
                         </Card>
