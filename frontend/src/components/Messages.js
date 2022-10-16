@@ -11,29 +11,31 @@ import { io } from 'socket.io-client';
 const Messages = () => {
     const socket = io();
     const dispatch = useDispatch();
-    const messages = Object.values(useSelector((state) => state.messages.entities));
-
-    const quantity = useSelector((state) => state.messages.ids).length;
-
-    const addMessage = (message) => {
-        dispatch(messagesActions.addMessage(message))
-    }
-
-    socket.on('newMessage', (payload) => {
-        console.log(payload)
-        dispatch(messagesActions.addMessage(payload));
-      });
 
     useEffect(() => {
         dispatch(fetchMessages());
     }, []);
+    
+    const allMessages = Object.values(useSelector((state) => state.messages.entities));
+    const channels = Object.values(useSelector((state) => state.channels.entities));
+
+    const currentChannelId = useSelector((state) => state.channels.currentChannelId);
+    const activeChannel = channels.find(({ id }) => id === currentChannelId);
+    const channelName = activeChannel ? activeChannel.name : 'general';
+
+    const messages = allMessages.filter(({ channelId }) => channelId === currentChannelId);
+    const quantity = messages.length;
+
+    socket.on('newMessage', (payload) => {
+        dispatch(messagesActions.addMessage(payload));
+      });
 
     return (
         <div className="col p-0 h-100">
             <div className="d-flex flex-column h-100">
                 <div className='bg-light mb-4 p-3 shadow-sm small'>
                     <p className='m-0'>
-                        <b># general</b>
+                        <b># {channelName}</b>
                     </p>
                     <span className='text-muted'>{quantity} сообщений</span>
                 </div>
@@ -46,7 +48,7 @@ const Messages = () => {
                         </div>
                     ))}
                 </div>
-                <NewMessagesForm addMessage={addMessage} />
+                <NewMessagesForm />
             </div>
         </div>
     );

@@ -1,6 +1,9 @@
 import { io } from "socket.io-client";
+import { useSelector } from "react-redux";
 
-const NewMessagesForm = ({addMessage}) => {
+const NewMessagesForm = () => {
+
+    const currentChannelId = useSelector((state) => state.channels.currentChannelId);
 
     const socket = io();
 
@@ -10,7 +13,7 @@ const NewMessagesForm = ({addMessage}) => {
         const message = {
             body: data.get('text'),
             username: localStorage.getItem('username'),
-            channelId: 1,
+            channelId: currentChannelId,
         };
         socket.emit('newMessage', message, (response) => {
             console.log(response.status)

@@ -29,7 +29,6 @@ const messagesSlice = createSlice({
             state.error = null;
           })
           .addCase(fetchMessages.fulfilled, (state, { payload }) => {
-            console.log(payload)
             messagesAdapter.addMany(state, payload.messages);
             state.loadingStatus = 'idle';
             state.error = null;

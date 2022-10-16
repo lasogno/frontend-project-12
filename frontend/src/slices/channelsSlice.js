@@ -18,9 +18,15 @@ const channelsAdapter = createEntityAdapter();
 
 const channelsSlice = createSlice({
     name: 'channels',
-    initialState: channelsAdapter.getInitialState({ loadingStatus: 'idle', error: null }),
+    initialState: channelsAdapter.getInitialState({ loadingStatus: 'idle', error: null, currentChannelId: 1 }),
     reducers: {
-
+      setCurrentChannel(state, { payload }) {
+        state.currentChannelId = payload.channelId;
+      },
+      addNewChannel(state, { payload }){
+        channelsAdapter.addOne(state, payload);
+        state.currentChannelId = payload.id;
+      }
     },
     extraReducers: (builder) => {
         builder
