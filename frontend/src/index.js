@@ -1,24 +1,14 @@
+/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
-import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import ReactDOM from 'react-dom/client';
+import init from './init';
+import initSocket from './websocket';
 
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { Provider } from 'react-redux';
-
-import App from "./components/App";
-import store from './slices/index.js';
-
-const rootElement = document.getElementById("root");
-const root = createRoot(rootElement);
-
+const socket = initSocket();
+const vdom = init(socket);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </BrowserRouter>
-  </StrictMode>
+  <React.StrictMode>
+    {vdom}
+  </React.StrictMode>,
 );

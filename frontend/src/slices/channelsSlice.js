@@ -1,47 +1,60 @@
-import { createAsyncThunk, createSlice, createEntityAdapter } from '@reduxjs/toolkit';
-
+/* eslint-disable no-param-reassign */
+import { createSlice, createEntityAdapter, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-export const fetchChannels = createAsyncThunk(
-    'channels/fetchChannels',
-    async () => {
-        const token = localStorage.getItem('auth');
-        const response = await axios.get('/api/v1/data', { headers: {
-            'Authorization': `Bearer ${token}`,
-          }
-        })
-        return response.data;
-    },
-);
+export const fetchData = createAsyncThunk('channels/fetchData', async (getAuthHeader, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.get('/api/v1/data', { headers: getAuthHeader() });
+    return data;
+  } catch (e) {
+    return rejectWithValue('Data not found');
+  }
+});
 
 const channelsAdapter = createEntityAdapter();
 
+const initialState = channelsAdapter.getInitialState({
+  currentChannelId: null,
+  channelsState: null,
+  error: null,
+});
+
 const channelsSlice = createSlice({
-    name: 'channels',
-    initialState: channelsAdapter.getInitialState({ loadingStatus: 'idle', error: null, currentChannelId: 1 }),
-    reducers: {
-      setCurrentChannel(state, { payload }) {
-        state.currentChannelId = payload.channelId;
-      },
-      addNewChannel(state, { payload }){
-        channelsAdapter.addOne(state, payload);
-        state.currentChannelId = payload.id;
+  name: 'channels',
+  initialState,
+  reducers: {
+    addChannel: channelsAdapter.addOne,
+    addChannels: channelsAdapter.addMany,
+    removeChannel: channelsAdapter.removeOne,
+    updateChannel: channelsAdapter.updateOne,
+    setDefaultChannelId: (state, { payload }) => {
+      if (payload === state.currentChannelId) {
+        state.currentChannelId = 1;
       }
     },
-    extraReducers: (builder) => {
-        builder
-          .addCase(fetchChannels.pending, (state) => {
-            state.loadingStatus = 'loading';
-            state.error = null;
-          })
-          .addCase(fetchChannels.fulfilled, (state, { payload }) => {
-            channelsAdapter.addMany(state, payload.channels);
-            state.loadingStatus = 'idle';
-            state.error = null;
-          });
-      },
-})
-
+    setCurrentChannelId: (state, { payload }) => {
+      state.currentChannelId = payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchData.pending, (state) => {
+        state.channelsState = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchData.fulfilled, (state, { payload }) => {
+        const { channels, currentChannelId } = payload;
+        channelsAdapter.addMany(state, channels);
+        state.currentChannelId = currentChannelId;
+        state.channelsState = 'idle';
+        state.error = null;
+      })
+      .addCase(fetchData.rejected, (state, { payload }) => {
+        state.channelsState = 'failed';
+        state.error = payload;
+      });
+  },
+});
 export const { actions } = channelsSlice;
-
+export const selectors = channelsAdapter.getSelectors((state) => state.channels);
 export default channelsSlice.reducer;
