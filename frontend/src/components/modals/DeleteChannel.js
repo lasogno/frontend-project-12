@@ -15,7 +15,7 @@ const DeleteChannel = ({ onHide }) => {
     <>
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {t('modals.headers.rename')}
+          {t('modals.headers.remove')}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
