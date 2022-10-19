@@ -28,7 +28,7 @@ const initSocket = () => {
   };
 
   socket.on('removeChannel', ({ id }) => {
-    store.dispatch(channelsActions.setCurrentChannel({ id: 1 }));
+    store.dispatch(channelsActions.setCurrentChannelId({ id: 1 }));
     store.dispatch(channelsActions.deleteChannel(id));
   });
   const deleteChannel = (id, callback) => {
