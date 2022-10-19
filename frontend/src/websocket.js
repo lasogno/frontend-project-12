@@ -13,8 +13,8 @@ const initSocket = () => {
   };
 
   socket.on('newChannel', (payload) => {
-    store.dispatch(channelsActions.addNewChannel(payload));
-    store.dispatch(channelsActions.setCurrentChannel(payload.id));
+    store.dispatch(channelsActions.addChannel(payload));
+    store.dispatch(channelsActions.setCurrentChannelId(payload.id));
   });
   const createNewChannel = (name, callback) => {
     socket.emit('newChannel', { name }, callback);
